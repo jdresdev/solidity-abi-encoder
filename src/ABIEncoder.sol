@@ -46,5 +46,34 @@ contract ABIEncoder {
     ) external view returns (bytes32 positionId, bytes memory encodedData) {
         // Encode the position data
         encodedData = abi.encodePacked(user, tokenIn, tokenOut, amountIn, minAmountOut, block.timestamp);
+
+        // Create a unique identifier for the position
+        positionId = keccak256(encodedData);
+    }
+
+    /**
+     * @dev Encodes data for a swap on a DEX
+     * @param path Array of tokens for the swap
+     * @param amount Array of amount
+     * @param deadline Transaction deadline
+     * @return swapData Encoded swap data
+     */
+    function encodeSwapData(address[] calldata path, uint256[] calldata amount, uint256 deadline) external pure returns (bytes memory swapData) {
+        require(path.length == amount.length, "Array length mismatch");
+
+        // Encodes path
+        bytes memory pathData;
+        for (uint i = 0; i < path.length; i++) {
+            pathData = abi.encodePacked(pathData, path[i]);
+        }
+
+        // Encodes amounts
+        bytes memory amountsData;
+        for (uint i = 0; i < path.length; i++) {
+            amountsData = abi.encodePacked(amountsData, amount[i]);
+        }
+
+        // Combines both
+        swapData = abi.encodePacked(pathData, amountsData, deadline);
     }
 }
