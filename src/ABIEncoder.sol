@@ -10,11 +10,7 @@ contract ABIEncoder {
     // Events to show the codification
     event DataEncoded(bytes32 indexed hash, bytes encodedData);
     event PoolIdentifier(bytes32 indexed poolId, address token, uint256 rate);
-    event UserPositionEncoded(
-        bytes32 indexed positionId,
-        address user,
-        uint256 amount
-    );
+    event UserPositionEncoded(bytes32 indexed positionId, address user, uint256 amount);
 
     /**
      * @dev Encodes the pool parameters
@@ -23,15 +19,9 @@ contract ABIEncoder {
      * @param fee pool fee
      * @return poolId identifier (unique for this pool)
      */
-    function createPoolIdentifier(
-        address tokenA,
-        address tokenB,
-        uint24 fee
-    ) external pure returns (bytes32 poolId) {
+    function createPoolIdentifier(address tokenA, address tokenB, uint24 fee) external pure returns (bytes32 poolId) {
         // We order the tokens
-        (address token0, address token1) = tokenA < tokenB
-            ? (tokenA, tokenB)
-            : (tokenB, tokenA);
+        (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
 
         // Use of ABI.ENCODEPACKED: Create unique pool identifier
         poolId = keccak256(abi.encodePacked(token0, token1, fee));
