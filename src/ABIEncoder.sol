@@ -176,4 +176,30 @@ contract ABIEncoder {
         data = abi.encodePacked(data, "MULTI_POOL_USER");
         userHash = keccak256(data);
     }
+
+    function encodeYieldStrategy(string calldata strategyName, address[] calldata pools, uint256[] calldata weights)
+        external
+        pure
+        returns (bytes memory strategyData)
+    {
+        require(pools.length == weights.length, "Arrays length mismatch");
+
+        // Encodes strategy name
+        bytes memory nameData = abi.encodePacked(strategyName);
+
+        // Encode pools
+        bytes memory poolsData;
+        for (uint256 i = 0; i < pools.length; i++) {
+            poolsData = abi.encodePacked(poolsData, pools[i]);
+        }
+
+        // Encode weights
+        bytes memory weightsData;
+        for (uint256 i = 0; i < weights.length; i++) {
+            poolsData = abi.encodePacked(poolsData, weights[i]);
+        }
+
+        // Combine everything
+        strategyData = abi.encodePacked(nameData, poolsData, weightsData, "YIELD_STRATEGY_V1");
+    }
 }
