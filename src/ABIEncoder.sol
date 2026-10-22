@@ -124,4 +124,56 @@ contract ABIEncoder {
     {
         positionId = keccak256(abi.encodePacked(user, poolId, amount, startTime, "YIELD_POSITION"));
     }
+
+    /**
+     * @dev Encodes data for a flash loan
+     * @param token Flash loan token
+     * @param amount Loan amount
+     * @param callbackData CallBack data
+     * @return flashData Encoded flash loan data
+     */
+    function encodeFlashLoadData(address token, uint256 amount, bytes calldata callbackData)
+        external
+        pure
+        returns (bytes memory flashData)
+    {
+        flashData = abi.encodePacked(token, amount, callbackData, "FLASH_LOAD_V1");
+    }
+
+    /**
+     * @dev Encodes parameters for a staking pool
+     * @param token Flash loan token
+     * @param rewardRate Loan amount
+     * @param lockPeriod Lock period
+     * @param maxStakers Maximum number of stakers
+     * @return poolConfig Encoded configuration data
+     */
+    function encodeStakingPoolConfig(address token, uint256 rewardRate, uint256 lockPeriod, uint256 maxStakers)
+        external
+        view
+        returns (bytes memory poolConfig)
+    {
+        poolConfig = abi.encodePacked(token, rewardRate, lockPeriod, maxStakers, block.timestamp);
+    }
+
+    /**
+     * @dev Creates a unique hash for a user across multiple pools
+     * @param user User address
+     * @param poolIds Array of pool identifiers
+     * @return userHash Unique user hash
+     */
+    function createUserMultiPoolHash(address user, bytes32[] calldata poolIds)
+        external
+        pure
+        returns (bytes32 userHash)
+    {
+        bytes memory data = abi.encodePacked(user);
+
+        for (uint256 i = 0; i < poolIds.length; i++) {
+            data = abi.encodePacked(data, poolIds[i]);
+        }
+
+        data = abi.encodePacked(data, "MULTI_POOL_USER");
+        userHash = keccak256(data);
+    }
 }
